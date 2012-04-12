@@ -16,7 +16,7 @@ class TestOpenstackRESTConnection(object):
 
     @with_setup(setup, teardown)
     def test_init(self):
-        assert self.connection != None
+        assert self.connection is not None
         assert self.connection.username == USER
         assert self.connection.password == PASSWORD
         assert self.connection.keystone_url == KEYSTONE_URL
@@ -32,31 +32,31 @@ class TestOpenstackRESTConnection(object):
     def testAuthenticateWithInvalidCredentials(self):
         connection = openstack_rest.api.OpenstackRESTConnection(
                 'invalid_username', 'invalid_password', KEYSTONE_URL)
-        assert connection != None
+        assert connection is not None
         with pytest.raises(InvalidRequestException):
             connection.authenticate()
 
     def testGetImages(self):
         images = self.connection.get_images() 
-        assert images != None
+        assert images is not None
         assert len(images) > 0
 
     def testGetInstances(self):
         instances = self.connection.get_instances()
-        assert instances != None
+        assert instances is not None
         assert len(instances) >= 0
 
     def testGetInstanceDetails(self):
         #relies on there being current instances running
         instance_id = self.connection.get_instances()[0]['id']
         details = self.connection.get_instance_details(instance_id)
-        assert details != None
+        assert details is not None
 
     def testGetInstanceMetadata(self):
         #relies on there being current instances running
         instance_id = self.connection.get_instances()[0]['id']
         metadata = self.connection.get_instance_metadata(instance_id)
-        assert metadata != None
+        assert metadata is not None
 
     def testSetAndGetInstanceMetadata(self):
         #relies on there being current instances running
@@ -66,6 +66,20 @@ class TestOpenstackRESTConnection(object):
         self.connection.set_instance_metadata(instance_id, metadata)
         metadata_retrieved = self.connection.get_instance_metadata(instance_id)
         assert metadata_retrieved['unit_test_key'] == 'unit_test_value'
+
+    def testSetAndGetMultipleInstanceMetadata(self):
+        #relies on there being current instances running
+        #WARNING: This will modify your running instances
+        instance_id = self.connection.get_instances()[0]['id']
+        metadata = {'one': 'a',
+                'two': 'b',
+                'three': 'c'}
+        self.connection.set_instance_metadata(instance_id, metadata)
+        metadata_retrieved = self.connection.get_instance_metadata(instance_id)
+        assert metadata_retrieved['one'] == 'a'
+        assert metadata_retrieved['two'] == 'b'
+        assert metadata_retrieved['three'] == 'c'
+        
 
     def testRenameInstance(self):
         #relies on there being current instances running
