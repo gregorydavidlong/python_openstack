@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Python openstack by gregorydavidlong</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Python openstack</h1>
+        <h2></h2>
+
+        <section id="downloads">
+          <a href="https://github.com/gregorydavidlong/python_openstack/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/gregorydavidlong/python_openstack/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/gregorydavidlong/python_openstack" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>OpenStack Python API</h1>
+
+<p>This light-weight OpenStack Python API merely wraps the REST API.</p>
+
+<p>For an example of how to use the api see examples/api_usage.py</p>
+
+<h2>Credentials</h2>
+
+<p>You will need to create a credentials.py file with the following variables:</p>
+
+<div class="highlight">
+<pre>  <span class="c"># Needed to use the API</span>
+  <span class="n">USER</span>      <span class="o">=</span> <span class="s">'myuser@somedomain'</span>     <span class="c"># Just your regular username.</span>
+  <span class="n">PASSWORD</span>  <span class="o">=</span> <span class="s">'MYPASSWORD'</span>      <span class="c"># From the Dashboard/credentials page (in the NeCTAR case it is NOT the password you use to login).</span>
+  <span class="n">KEYSTONE_URL</span> <span class="o">=</span> <span class="s">'keystone.rc.nectar.org.au:5000'</span> <span class="c"># The Keystone URL (this is the default NeCTAR URL)</span>
+
+  <span class="c"># These values are only needed if you're planning on running the unit tests. These are usually automatically determined by the API. Here are some examples.</span>
+  <span class="n">EXPECTED_NOVA_SERVER_URL</span> <span class="o">=</span> <span class="s">'nova.rc.nectar.org.au'</span>
+  <span class="n">EXPECTED_NOVA_PORT</span> <span class="o">=</span> <span class="s">'8774'</span>
+  <span class="n">EXPECTED_NOVA_DIRS_URL</span> <span class="o">=</span> <span class="s">'/v1.1/YOUR_TENANT_ID'</span>
+</pre>
+</div>
+
+
+<h2>Testing</h2>
+
+<p>To run the unit tests use (you will need to have nose installed):
+  nosetests tests/api_test.py</p>
+
+<p>WARNING: Be aware that, at the moment, the unit tests run against OpenStack using your credentials. The tests do stuff like renaming instances and setting metadata.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
