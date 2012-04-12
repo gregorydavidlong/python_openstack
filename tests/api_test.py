@@ -3,11 +3,11 @@ import pytest
 from nose.tools import with_setup
 from openstack_rest.api import OpenstackRESTConnection
 from openstack_rest.api import InvalidCredentialsException
-from credentials import USER, PASSWORD, KEYSTONE_URL, EXPECTED_NOVA_URL
+from credentials import USER, PASSWORD, KEYSTONE_URL, EXPECTED_NOVA_SERVER_URL, EXPECTED_NOVA_DIRS_URL
 
 class TestOpenstackRESTConnection(object):
     def setup(self):
-        self.connection = openstack_rest.api.OpenstackRESTConnection(
+        self.connection = OpenstackRESTConnection(
                 USER, PASSWORD, KEYSTONE_URL) 
 
     def teardown(self):
@@ -24,7 +24,8 @@ class TestOpenstackRESTConnection(object):
     def testAuthenticate(self):
         assert self.connection.authenticate()
         assert self.connection.token != ''
-        assert self.connection.nova_url == EXPECTED_NOVA_URL
+        assert self.connection.nova_server_url == EXPECTED_NOVA_SERVER_URL
+        assert self.connection.nova_dirs_url == EXPECTED_NOVA_DIRS_URL
 
     # Authenticate with incorrect credentials
     def testAuthenticateWithInvalidCredentials(self):
@@ -34,10 +35,9 @@ class TestOpenstackRESTConnection(object):
         with pytest.raises(InvalidCredentialsException):
             connection.authenticate()
 
-    def testListImages(self):
-        assert self.connection.list_images() != None
+    def testGetImages(self):
+        self.connection.authenticate()
+        images = self.connection.get_images() 
+        assert images != None
+        assert len(images) > 0
 
-    
-
-
-        
