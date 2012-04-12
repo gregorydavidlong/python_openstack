@@ -14,15 +14,27 @@ class OpenstackRESTConnection(object):
         self.nova_dirs_url = ''
         self.nova_port = ''
 
-    def _make_json_request(self, server_url, request_method, dirs_url, json_request):
+    def _make_json_request_without_token(self, server_url, request_method, dirs_url, json_request):
        conn = httplib.HTTPConnection(server_url)
        conn.request(request_method, dirs_url, json_request, {'Content-type': 'application/json'})
+       return json.loads(conn.getresponse().read())
+    
+    def _make_json_request(self, server_url, request_method, dirs_url, json_request):
+       conn = httplib.HTTPConnection(server_url)
+       # TODO: Move the port to a parameter
+       conn.port = self.nova_port
+       conn.request(request_method, dirs_url, json_request, 
+               {'X-Auth-Token': self.token, 
+                   'Content-type': 'application/json',
+                   'Accept': 'application/json'})
        return json.loads(conn.getresponse().read())
 
     def _make_request(self, server_url, request_method, dirs_url):
         conn = httplib.HTTPConnection(server_url)
+        # TODO: Move the port to a parameter
         conn.port = self.nova_port
-        headers = {'X-Auth-Token': self.token, 'Content-type': 'application/json'}
+        headers = {'X-Auth-Token': self.token, 
+                'Content-type': 'application/json'} 
         conn.request(request_method, dirs_url, None, headers)
         return json.loads(conn.getresponse().read())
 
@@ -36,7 +48,7 @@ class OpenstackRESTConnection(object):
                     }
                 }
             })
-        response = self._make_json_request(
+        response = self._make_json_request_without_token(
                 self.keystone_url, "POST", "/v2.0/tokens",
                 json_request)
 
@@ -51,7 +63,7 @@ class OpenstackRESTConnection(object):
             self.nova_dirs_url = re.search(regex, endpoint).group(3)
 
         except KeyError:
-            raise InvalidCredentialsException(response)
+            raise InvalidRequestException(response)
         return True
 
     # Get a collection of images
@@ -60,6 +72,32 @@ class OpenstackRESTConnection(object):
         return self._make_request(server_url, "GET",
             self.nova_dirs_url + "/images")['images']
 
+    # Get the currently running instances
+    def get_instances(self):
+        server_url = self.nova_server_url
+        return self._make_request(server_url, "GET",
+                self.nova_dirs_url + "/servers")['servers']
 
-class InvalidCredentialsException(Exception):
+    # Get detailed information about a running instance
+    def get_instance_details(self, instance_id):
+        return self._make_request(self.nova_server_url, "GET",
+                self.nova_dirs_url + "/servers/" + str(instance_id))
+
+    # Get the metadata associated with a currently running instance
+    def get_instance_metadata(self, instance_id):
+        return self._make_request(self.nova_server_url, "GET",
+                self.nova_dirs_url + "/servers/" + str(instance_id) +
+                "/metadata")['metadata']
+
+    def set_instance_metadata(self, instance_id, metadata):
+        metadata_wrap = {'metadata': metadata}
+        json_request = json.dumps(metadata_wrap)
+        return self._make_json_request(
+                self.nova_server_url, "PUT", self.nova_dirs_url + "/servers/" + str(instance_id) + "/metadata",
+                json_request)
+
+
+
+
+class InvalidRequestException(Exception):
     pass
