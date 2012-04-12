@@ -67,4 +67,19 @@ class TestOpenstackRESTConnection(object):
         metadata_retrieved = self.connection.get_instance_metadata(instance_id)
         assert metadata_retrieved['unit_test_key'] == 'unit_test_value'
 
+    def testRenameInstance(self):
+        #relies on there being current instances running
+        #WARNING: This will modify your running instances
+        instance = self.connection.get_instances()[0]
+        current_instance_name = instance['name']
+        new_instance_name = 'New Instance Name'
+        self.connection.set_instance_name(instance['id'], new_instance_name)
+        actual_instance_name = self.connection.get_instance_details(instance['id'])['name']
+        assert actual_instance_name == new_instance_name
+        #Change the name back
+        self.connection.set_instance_name(instance['id'], current_instance_name)
+        actual_instance_name = self.connection.get_instance_details(instance['id'])['name']
+        assert actual_instance_name == current_instance_name
+
+
 

@@ -81,7 +81,7 @@ class OpenstackRESTConnection(object):
     # Get detailed information about a running instance
     def get_instance_details(self, instance_id):
         return self._make_request(self.nova_server_url, "GET",
-                self.nova_dirs_url + "/servers/" + str(instance_id))
+                self.nova_dirs_url + "/servers/" + str(instance_id))['server']
 
     # Get the metadata associated with a currently running instance
     def get_instance_metadata(self, instance_id):
@@ -95,6 +95,12 @@ class OpenstackRESTConnection(object):
         return self._make_json_request(
                 self.nova_server_url, "PUT", self.nova_dirs_url + "/servers/" + str(instance_id) + "/metadata",
                 json_request)
+
+    def set_instance_name(self, instance_id, name):
+        json_request = json.dumps({'server': {'name': name}})
+        return self._make_json_request(
+                self.nova_server_url, "PUT", self.nova_dirs_url + "/servers/" +
+                str(instance_id), json_request)
 
 
 
