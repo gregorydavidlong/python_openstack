@@ -19,20 +19,18 @@ class OpenstackRESTConnection(object):
        conn.request(request_method, dirs_url, json_request, {'Content-type': 'application/json'})
        return json.loads(conn.getresponse().read())
     
-    def _make_json_request(self, server_url, request_method, dirs_url, json_request):
+    def _make_json_request(self, server_url, port, request_method, dirs_url, json_request):
        conn = httplib.HTTPConnection(server_url)
-       # TODO: Move the port to a parameter
-       conn.port = self.nova_port
+       conn.port = port
        conn.request(request_method, dirs_url, json_request, 
                {'X-Auth-Token': self.token, 
                    'Content-type': 'application/json',
                    'Accept': 'application/json'})
        return json.loads(conn.getresponse().read())
 
-    def _make_request(self, server_url, request_method, dirs_url):
+    def _make_request(self, server_url, port, request_method, dirs_url):
         conn = httplib.HTTPConnection(server_url)
-        # TODO: Move the port to a parameter
-        conn.port = self.nova_port
+        conn.port = port
         headers = {'X-Auth-Token': self.token, 
                 'Content-type': 'application/json'} 
         conn.request(request_method, dirs_url, None, headers)
@@ -69,23 +67,21 @@ class OpenstackRESTConnection(object):
     # Get a collection of images
     def get_images(self):
         server_url = self.nova_server_url
-        return self._make_request(server_url, "GET",
-            self.nova_dirs_url + "/images")['images']
+        return self._make_request(server_url, self.nova_port, "GET", self.nova_dirs_url + "/images")['images']
 
     # Get the currently running instances
     def get_instances(self):
         server_url = self.nova_server_url
-        return self._make_request(server_url, "GET",
-                self.nova_dirs_url + "/servers")['servers']
+        return self._make_request(server_url, self.nova_port, "GET", self.nova_dirs_url + "/servers")['servers']
 
     # Get detailed information about a running instance
     def get_instance_details(self, instance_id):
-        return self._make_request(self.nova_server_url, "GET",
+        return self._make_request(self.nova_server_url, self.nova_port, "GET",
                 self.nova_dirs_url + "/servers/" + str(instance_id))['server']
 
     # Get the metadata associated with a currently running instance
     def get_instance_metadata(self, instance_id):
-        return self._make_request(self.nova_server_url, "GET",
+        return self._make_request(self.nova_server_url, self.nova_port, "GET",
                 self.nova_dirs_url + "/servers/" + str(instance_id) +
                 "/metadata")['metadata']
 
@@ -93,13 +89,13 @@ class OpenstackRESTConnection(object):
         metadata_wrap = {'metadata': metadata}
         json_request = json.dumps(metadata_wrap)
         return self._make_json_request(
-                self.nova_server_url, "PUT", self.nova_dirs_url + "/servers/" + str(instance_id) + "/metadata",
+                self.nova_server_url, self.nova_port, "PUT", self.nova_dirs_url + "/servers/" + str(instance_id) + "/metadata",
                 json_request)
 
     def set_instance_name(self, instance_id, name):
         json_request = json.dumps({'server': {'name': name}})
         return self._make_json_request(
-                self.nova_server_url, "PUT", self.nova_dirs_url + "/servers/" +
+                self.nova_server_url, self.nova_port, "PUT", self.nova_dirs_url + "/servers/" +
                 str(instance_id), json_request)
 
 
