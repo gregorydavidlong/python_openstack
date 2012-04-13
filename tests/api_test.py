@@ -61,6 +61,20 @@ class TestOpenstackRESTConnection(unittest.TestCase):
         metadata_retrieved = self.connection.get_instance_metadata(instance_id)
         assert metadata_retrieved['unit_test_key'] == 'unit_test_value'
 
+    def testSetAndGetMultipleInstanceMetadata(self):
+        #relies on there being current instances running
+        #WARNING: This will modify your running instances
+        instance_id = self.connection.get_instances()[0]['id']
+        metadata = {'one': 'a',
+                'two': 'b',
+                'three': 'c'}
+        self.connection.set_instance_metadata(instance_id, metadata)
+        metadata_retrieved = self.connection.get_instance_metadata(instance_id)
+        assert metadata_retrieved['one'] == 'a'
+        assert metadata_retrieved['two'] == 'b'
+        assert metadata_retrieved['three'] == 'c'
+        
+
     def testRenameInstance(self):
         #relies on there being current instances running
         #WARNING: This will modify your running instances

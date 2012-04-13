@@ -1,6 +1,6 @@
 from openstack_rest.api import OpenstackRESTConnection
 from openstack_rest.api import InvalidCredentialsException
-from credentials import USER, PASSWORD, KEYSTONE_URL, EXPECTED_NOVA_SERVER_URL, EXPECTED_NOVA_DIRS_URL
+from credentials import USER, PASSWORD, KEYSTONE_URL
 
 c = OpenstackRESTConnection(USER, PASSWORD, KEYSTONE_URL)
 c.authenticate()

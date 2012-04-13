@@ -26,6 +26,7 @@ Testing
 -------
 
 To run the unit tests use (you will need to have nose installed):
+
   nosetests tests/api_test.py
 
 WARNING: Be aware that, at the moment, the unit tests run against OpenStack using your credentials. The tests do stuff like renaming instances and setting metadata.
